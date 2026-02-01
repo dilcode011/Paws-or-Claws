@@ -1,59 +1,90 @@
-#  Dog vs Cat Image Classifier
+#  Dog vs Cat Classifier (CNN)
 
-A Deep Learning project that classifies images as either a **Dog** or a **Cat** using a Convolutional Neural Network (CNN). Built with TensorFlow and Keras, this model is trained on the Kaggle Dogs vs. Cats dataset.
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
+![Keras](https://img.shields.io/badge/Keras-Deep%20Learning-red)
+![Status](https://img.shields.io/badge/Status-Completed-success)
+
+A Deep Learning project that distinguishes between images of dogs and cats using a **Convolutional Neural Network (CNN)**. Built from scratch using TensorFlow and Keras, this model is trained on the Kaggle Dogs vs. Cats dataset.
 
 ##  Project Overview
-This project demonstrates the end-to-end process of building a binary image classifier. It covers:
-* **Data Handling:** Fetching data directly from Kaggle and preprocessing images (resizing, normalization).
-* **Model Architecture:** Building a custom CNN from scratch with Convolutional, Pooling, and Dense layers.
-* **Evaluation:** Analyzing training performance and checking for overfitting using Matplotlib.
-* **Inference:** Predicting the class of new, unseen images.
+The goal of this project is to build a binary image classifier capable of identifying whether an input image contains a dog or a cat. The project handles the entire pipeline:
+1.  **Data Ingestion:** Fetching the dataset programmatically via the Kaggle API.
+2.  **Preprocessing:** Rescaling images (normalization) and resizing them to `256x256` pixels.
+3.  **Modeling:** Designing a custom CNN architecture to extract spatial features.
+4.  **Evaluation:** Analyzing training vs. validation accuracy to check for overfitting.
+5.  **Prediction:** Testing the model on real-world, unseen images.
 
-##  Tech Stack
-* **Language:** Python
-* **Deep Learning:** TensorFlow, Keras
+##  Dataset
+* **Source:** [Kaggle Dogs vs. Cats Dataset](https://www.kaggle.com/datasets/salader/dogsvscats)
+* **Structure:**
+    * `train/`: 20,000 images (10,000 Dogs, 10,000 Cats)
+    * `test/`: 5,000 images (2,500 Dogs, 2,500 Cats)
+* **Input Shape:** `(256, 256, 3)` (RGB Images)
+
+## 🛠️ Tech Stack
+* **Core:** Python
+* **Deep Learning Framework:** TensorFlow, Keras
 * **Computer Vision:** OpenCV (`cv2`)
+* **Data Handling:** NumPy, Pandas
 * **Visualization:** Matplotlib
-* **Data Source:** Kaggle API
 
 ##  Model Architecture
-The model is a Sequential CNN designed to extract features and perform binary classification:
+The model uses a sequential CNN design optimized for feature extraction:
 
-1.  **Convolutional Blocks:**
-    * 3 layers of **Conv2D** (32, 64, 128 filters) with **ReLU** activation.
-    * **MaxPooling2D** to reduce spatial dimensions.
-    * **BatchNormalization** for faster convergence.
-2.  **Dense Layers:**
-    * Flatten layer to convert 2D maps to 1D vectors.
-    * Fully connected layers (128 & 64 neurons).
-    * **Dropout (0.1)** to reduce overfitting.
-3.  **Output Layer:**
-    * 1 neuron with **Sigmoid** activation (outputs probability between 0 and 1).
+| Layer Type | Specifications | Purpose |
+| :--- | :--- | :--- |
+| **Conv2D** | 32 filters, 3x3 kernel, ReLU | Basic feature detection (edges, colors) |
+| **MaxPooling2D** | 2x2 pool size | Reduces spatial dimensions |
+| **Conv2D** | 64 filters, 3x3 kernel, ReLU | Complex feature detection (textures) |
+| **MaxPooling2D** | 2x2 pool size | Reduces spatial dimensions |
+| **Conv2D** | 128 filters, 3x3 kernel, ReLU | High-level feature detection (shapes) |
+| **BatchNormalization** | - | Stabilizes learning and speeds up convergence |
+| **Flatten** | - | Converts 2D maps to 1D vector |
+| **Dense** | 128 neurons, ReLU | Fully connected classification layer |
+| **Dropout** | 0.1 rate | Prevents overfitting by randomly dropping neurons |
+| **Dense (Output)** | 1 neuron, Sigmoid | Outputs probability (0 = Cat, 1 = Dog) |
 
-##  Results
-* **Training Accuracy:** ~95%
-* **Validation Accuracy:** ~83%
-* **Observation:** The model learns the training data very well. The gap between training and validation accuracy suggests some overfitting, which could be improved in future versions using Data Augmentation.
+##  Installation & Setup
+This project is designed to run in **Google Colab** or a local Jupyter Notebook environment.
 
-##  How to Run
-This project is optimized for **Google Colab**.
+### Prerequisites
+* A Kaggle account and a `kaggle.json` API token.
 
-1.  **Clone the Repository:**
+### Steps
+1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/](https://github.com/)[Your-Username]/[Your-Repo-Name].git
+    git clone [https://github.com/dilcode011/dog-vs-cat-cnn.git](https://github.com/dilcode011/dog-vs-cat-cnn.git)
+    cd dog-vs-cat-cnn
     ```
-2.  **Open in Colab:**
-    Upload the `DOGvsCAT.ipynb` file to Google Colab.
-3.  **Setup Kaggle API:**
-    * You will need your own `kaggle.json` API key.
-    * Upload `kaggle.json` to the Colab session when prompted or manually place it in the root directory.
-4.  **Run All Cells:**
-    Execute the cells to download the dataset, train the model, and view predictions.
 
-##  Sample Prediction
-The notebook includes code to test the model on real-world images:
+2.  **Install Dependencies**
+    ```bash
+    pip install tensorflow opencv-python matplotlib
+    ```
+
+3.  **Setup Kaggle API**
+    * Place your `kaggle.json` file in the root directory.
+    * The notebook will automatically move it to `~/.kaggle/` to authenticate the download.
+
+4.  **Run the Notebook**
+    Open `DOGvsCAT.ipynb` and execute the cells sequentially.
+
+## 📷 Sample Predictions
+The notebook includes a testing phase where the model validates its learning on real-world unseen images. Two specific test cases were used to verify binary classification:
+
 ```python
 import cv2
-test_img = cv2.imread('dog.webp')
-# ... preprocessing steps ...
-prediction = model.predict(test_input) # Output > 0.5 indicates Dog
+import matplotlib.pyplot as plt
+
+# 1. Test on a Dog Image
+test_img_dog = cv2.imread('dog.webp')
+test_input_dog = cv2.resize(test_img_dog, (256,256)).reshape((1,256,256,3))
+model.predict(test_input_dog)  
+# Result: High Probability (> 0.5) -> Classified as DOG
+
+# 2. Test on a Cat Image
+test_img_cat = cv2.imread('cat.webp')
+test_input_cat = cv2.resize(test_img_cat, (256,256)).reshape((1,256,256,3))
+model.predict(test_input_cat)  
+# Result: Low Probability (< 0.5) -> Classified as CAT
